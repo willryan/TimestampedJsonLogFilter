@@ -52,13 +52,8 @@ module Parse =
       List.map fileToLines files
 
     let linesToFileObject earliest (lines, filename) =
-       let identifier = {
-         Module = filename
-         CsuGroup = filename
-         CsuNodeId = filename
-       }
        {
-          Filename = Node identifier
+          Filename = filename
           Lines =
             lines
             |> List.map (fun (time, data) ->

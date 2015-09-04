@@ -10,19 +10,8 @@ module Types =
     Data : JObject
   }
 
-  type NodeIdentifier = {
-    Module : string
-    CsuGroup : string
-    CsuNodeId : string
-  }
-
-  type LogFilename =
-    | Initial
-    | Events
-    | Node of NodeIdentifier
-
   type LogFile = {
-    Filename : LogFilename
+    Filename : string
     Lines : LogLine list
   }
 
@@ -51,5 +40,5 @@ module Types =
   type Query = {
     Where : QueryWhere list
     When : QueryTime option
-    From : LogFilename option
+    From : string option
   }
