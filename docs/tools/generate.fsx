@@ -11,17 +11,17 @@
 // (This is the original behaviour of ProjectScaffold prior to multi project support)
 let referenceBinaries = []
 // Web site location for the generated documentation
-let website = "/##ProjectName##"
+let website = "/TimestampedJsonLogFilter"
 
-let githubLink = "http://github.com/##GitHome##/##GitName##"
+let githubLink = "http://github.com/willryan/TimestampedJsonLogFilter"
 
 // Specify more information about your project
 let info =
-  [ "project-name", "##ProjectName##"
-    "project-author", "##Author##"
-    "project-summary", "##Summary##"
+  [ "project-name", "TimestampedJsonLogFilter"
+    "project-author", "Will Ryan"
+    "project-summary", "filters timestamped json logs"
     "project-github", githubLink
-    "project-nuget", "http://nuget.org/packages/##ProjectName##" ]
+    "project-nuget", "http://nuget.org/packages/TimestampedJsonLogFilter" ]
 
 // --------------------------------------------------------------------------------------
 // For typical project, no changes are needed below
@@ -139,8 +139,8 @@ let buildDocumentation () =
 // Generate
 copyFiles()
 #if HELP
-buildDocumentation()
+(* buildDocumentation() *)
 #endif
 #if REFERENCE
-buildReference()
+(* buildReference() *)
 #endif

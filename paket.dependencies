@@ -1,9 +1,19 @@
 source https://nuget.org/api/v2
 
+nuget RProvider ~> "1.1.12"
 nuget FSharp.Formatting
-nuget NUnit 
+nuget FSharp.Data
+nuget Deedle
+nuget Foogle.Charts
+nuget FsLab
+nuget NUnit
 nuget NUnit.Runners
 nuget FAKE
+nuget Newtonsoft.Json ~> "6.0.8"
 nuget SourceLink.Fake
+nuget XPlot.GoogleCharts.Deedle
+nuget Google.DataTable.Net.Wrapper
+nuget XPlot.Plotly
+nuget FsUnit
 
 github fsharp/FAKE modules/Octokit/Octokit.fsx
