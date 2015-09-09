@@ -71,13 +71,18 @@ module Parse =
           fst (List.minBy fst lines)
         )
       let earliest = fst (List.head earliestLines)
-      List.map (linesToFileObject earliest) filesLines
+      let files =List.map (linesToFileObject earliest) filesLines
+      earliest, files
 
-  let FromDirectory (directory:string) : Log =
+  let fromDirectory (directory:string) : Log =
+    let (earliest, files) =
+      directory
+      |> Internal.filesInDir
+      |> Internal.filesToLines
+      |> Internal.linesToFileObjects
     {
-      Files =
-        directory
-        |> Internal.filesInDir
-        |> Internal.filesToLines
-        |> Internal.linesToFileObjects
+      Files = files
+      Time = earliest
     }
+
+  //let ToDirectory (log:Log) (directoryPath:string) =

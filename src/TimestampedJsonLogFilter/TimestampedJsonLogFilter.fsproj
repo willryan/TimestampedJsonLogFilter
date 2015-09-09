@@ -48,6 +48,7 @@
     <Compile Include="Types.fs" />
     <Compile Include="Parsing.fs" />
     <Compile Include="QueryConditions.fs" />
+    <Compile Include="Log.fs" />
     <None Include="Script.fsx" />
     <None Include="paket.references" />
     <None Include="paket.template" />

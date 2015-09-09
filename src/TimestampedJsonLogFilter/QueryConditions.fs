@@ -11,29 +11,29 @@ module QueryConditions =
       let asObj = o :> Object
       Convert.ChangeType(asObj, typeof<'T>) :?> 'T
 
-  let Exists (o:JToken) =
+  let exists (o:JToken) =
     o <> null
 
-  let Cast<'T when 'T :> Object> (f:'T -> bool) (o:JToken) =
+  let cast<'T when 'T :> Object> (f:'T -> bool) (o:JToken) =
     f (Internal.JTokenToType<'T> o)
 
-  let Math = Cast<decimal>
+  let mathCast = cast<decimal>
 
-  let MathEquals value = Math (fun v -> v = value)
+  let mathEquals value = mathCast (fun v -> v = value)
 
-  let Gt value = Math (fun v -> v > value)
+  let gt value = mathCast (fun v -> v > value)
 
-  let Lt value = Math (fun v -> v < value)
+  let lt value = mathCast (fun v -> v < value)
 
-  let String = Cast<string>
+  let stringCast = cast<string>
 
-  let StringEquals value = String (fun v -> v = value)
+  let stringEquals value = stringCast (fun v -> v = value)
 
-  let ContainsString value = String (fun v -> v.Contains(value))
+  let containsString value = stringCast (fun v -> v.Contains(value))
 
-  let Array = Cast<JArray>
+  let arrayCast = cast<JArray>
 
-  let ArrayContains<'T when 'T : equality> (value:'T) = Array (fun v -> 
+  let arrayContains<'T when 'T : equality> (value:'T) = arrayCast (fun v ->
     v.Children()
     |> Seq.tryFind (fun o ->
       let converted = Internal.JTokenToType o
@@ -42,11 +42,11 @@ module QueryConditions =
     |> Option.isSome
     )
 
-  let Not f o =
+  let qNot f o =
     not <| f o
 
-  let And c1 c2 o =
+  let qAnd c1 c2 o =
     (c1 o) && (c2 o)
 
-  let Or c1 c2 o =
+  let qOr c1 c2 o =
     (c1 o) || (c2 o)

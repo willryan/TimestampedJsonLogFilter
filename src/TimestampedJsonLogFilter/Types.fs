@@ -1,14 +1,17 @@
 namespace TimestampedJsonLogFilter
 
 open System
+open Newtonsoft.Json
 open Newtonsoft.Json.Linq
 
 module Types =
 
+  [<StructuredFormatDisplay("{Format}")>]
   type LogLine = {
     Time : TimeSpan
     Data : JToken
-  }
+  } with
+    member x.Format = sprintf "%A\t%s" x.Time (x.Data.ToString(Formatting.None))
 
   type LogFile = {
     Filename : string
@@ -16,6 +19,7 @@ module Types =
   }
 
   type Log = {
+    Time : DateTime
     Files : LogFile list
   }
 
@@ -29,12 +33,7 @@ module Types =
   type LogMap = JToken -> JToken
 
   type QueryWhere = {
-    path : string
-    condition : QueryCondition
+    Path : string
+    Condition : QueryCondition
   }
 
-  type Query = {
-    Where : QueryWhere list
-    When : QueryTime option
-    From : string option
-  }

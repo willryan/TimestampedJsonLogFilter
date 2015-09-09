@@ -1,5 +1,8 @@
-#load "../../packages/FsLab/FsLab.fsx"
+#r "TimestampedJsonLogFilter.dll"
 
-open Foogle
-open Deedle
-open FSharp.Data
+open TimestampedJsonLogFilter
+open TimestampedJsonLogFilter.Types
+open TimestampedJsonLogFilter.QueryConditions
+
+let log = Log.fromDirectory fsi.CommandLineArgs.[1]
+

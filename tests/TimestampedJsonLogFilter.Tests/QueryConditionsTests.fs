@@ -20,62 +20,62 @@ module QueryConditionsTests =
   [<Test>]
   let ``Exists filters properly`` () =
     let tok = jObj.SelectToken("a")
-    Exists tok |> should equal true
+    exists tok |> should equal true
     let tok2 = jObj.SelectToken("c")
-    Exists tok2 |> should equal false
+    exists tok2 |> should equal false
 
   [<Test>]
   let ``MathEquals filters properly`` () =
     let tok = jObj.SelectToken("d")
-    MathEquals 10m tok |> should equal true
-    MathEquals 10.1m tok |> should equal false
+    mathEquals 10m tok |> should equal true
+    mathEquals 10.1m tok |> should equal false
 
   [<Test>]
   let ``Gt filters properly`` () =
     let tok = jObj.SelectToken("a")
-    Gt 5m tok |> should equal false
+    gt 5m tok |> should equal false
     let tok2 = jObj.SelectToken("d")
-    Gt 5m tok2 |> should equal true
+    gt 5m tok2 |> should equal true
 
   [<Test>]
   let ``Lt filters properly`` () =
     let tok = jObj.SelectToken("a")
-    Lt 5m tok |> should equal true
+    lt 5m tok |> should equal true
     let tok2 = jObj.SelectToken("d")
-    Lt 5m tok2 |> should equal false
+    lt 5m tok2 |> should equal false
 
   [<Test>]
   let ``StringEquals filters properly`` () =
     let tok = jObj.SelectToken("a")
-    StringEquals "1" tok |> should equal true
+    stringEquals "1" tok |> should equal true
     let tok2 = jObj.SelectToken("b")
-    StringEquals "bar" tok2 |> should equal true
-    StringEquals "foobar" tok2 |> should equal false
-    StringEquals "barfoo" tok2 |> should equal false
+    stringEquals "bar" tok2 |> should equal true
+    stringEquals "foobar" tok2 |> should equal false
+    stringEquals "barfoo" tok2 |> should equal false
 
   [<Test>]
   let ``ContainsString filters properly`` () =
     let tok = jObj.SelectToken("b")
-    ContainsString "bar" tok |> should equal true
-    ContainsString "ba" tok |> should equal true
-    ContainsString "ar" tok |> should equal true
-    ContainsString "barf" tok |> should equal false
+    containsString "bar" tok |> should equal true
+    containsString "ba" tok |> should equal true
+    containsString "ar" tok |> should equal true
+    containsString "barf" tok |> should equal false
 
   [<Test>]
   let ``Contains filters properly`` () =
     let tok = jObj.SelectToken("e")
-    ArrayContains 2 tok |> should equal true
-    ArrayContains 3 tok |> should equal false
-    ArrayContains 8 tok |> should equal true
+    arrayContains 2 tok |> should equal true
+    arrayContains 3 tok |> should equal false
+    arrayContains 8 tok |> should equal true
 
   [<Test>]
   let ``boolean algebra`` () =
     let tok = jObj.SelectToken("e")
-    (And (ArrayContains 4) (ArrayContains 8)) tok |> should equal true
-    (And (ArrayContains 5) (ArrayContains 8)) tok |> should equal false
-    (Or (ArrayContains 5) (ArrayContains 8)) tok |> should equal true
-    (Not (Or (ArrayContains 5) (ArrayContains 8))) tok |> should equal false
-    (Not (And (ArrayContains 5) (ArrayContains 8))) tok |> should equal true
-    (And (ArrayContains 4) (Not (ArrayContains 5))) tok |> should equal true
+    (qAnd (arrayContains 4) (arrayContains 8)) tok |> should equal true
+    (qAnd (arrayContains 5) (arrayContains 8)) tok |> should equal false
+    (qOr (arrayContains 5) (arrayContains 8)) tok |> should equal true
+    (qNot (qOr (arrayContains 5) (arrayContains 8))) tok |> should equal false
+    (qNot (qAnd (arrayContains 5) (arrayContains 8))) tok |> should equal true
+    (qAnd (arrayContains 4) (qNot (arrayContains 5))) tok |> should equal true
 
-  
+
