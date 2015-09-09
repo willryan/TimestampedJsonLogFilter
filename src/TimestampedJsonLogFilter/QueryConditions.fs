@@ -6,13 +6,16 @@ open Newtonsoft.Json.Linq
 
 module QueryConditions =
 
+  module Internal =
+    let JTokenToType<'T when 'T :> Object> (o:JToken) =
+      let asObj = o :> Object
+      Convert.ChangeType(asObj, typeof<'T>) :?> 'T
+
   let Exists (o:JToken) =
     o <> null
 
   let Cast<'T when 'T :> Object> (f:'T -> bool) (o:JToken) =
-    let asObj = o :> Object
-    let v = Convert.ChangeType(asObj, typeof<'T>) :?> 'T
-    f v
+    f (Internal.JTokenToType<'T> o)
 
   let Math = Cast<decimal>
 
@@ -29,6 +32,15 @@ module QueryConditions =
   let ContainsString value = String (fun v -> v.Contains(value))
 
   let Array = Cast<JArray>
+
+  let ArrayContains<'T when 'T : equality> (value:'T) = Array (fun v -> 
+    v.Children()
+    |> Seq.tryFind (fun o ->
+      let converted = Internal.JTokenToType o
+      converted = value
+      )
+    |> Option.isSome
+    )
 
   let Not f o =
     not <| f o
