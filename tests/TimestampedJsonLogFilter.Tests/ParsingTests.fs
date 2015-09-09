@@ -1,4 +1,4 @@
-module TimestampedJsonLogFilter.Tests
+namespace TimestampedJsonLogFilter.Tests
 
 open TimestampedJsonLogFilter.Parse
 open NUnit.Framework

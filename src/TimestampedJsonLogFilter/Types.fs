@@ -7,7 +7,7 @@ module Types =
 
   type LogLine = {
     Time : TimeSpan
-    Data : JObject
+    Data : JToken
   }
 
   type LogFile = {
@@ -24,17 +24,13 @@ module Types =
     | After of TimeSpan
     | Between of TimeSpan * TimeSpan
 
-  type QueryWhereOperator =
-    | Is of string
-    | IsNot of string
-    | Contains of string
-    | DoesNotContain of string
-    | GreaterThan of double
-    | LessThan of double
+  type QueryCondition = JToken -> bool
+
+  type LogMap = JToken -> JToken
 
   type QueryWhere = {
     path : string
-    condition : QueryWhereOperator option
+    condition : QueryCondition
   }
 
   type Query = {
