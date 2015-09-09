@@ -1,3 +1,4 @@
+#I "bin/Release"
 #r "TimestampedJsonLogFilter.dll"
 
 open TimestampedJsonLogFilter
