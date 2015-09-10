@@ -23,10 +23,11 @@ module Types =
     Files : LogFile list
   }
 
+  // in seconds
   type QueryTime =
-    | Before of TimeSpan
-    | After of TimeSpan
-    | Between of TimeSpan * TimeSpan
+    | Before of double
+    | After of double
+    | Between of double * double
 
   type QueryCondition = JToken -> bool
 

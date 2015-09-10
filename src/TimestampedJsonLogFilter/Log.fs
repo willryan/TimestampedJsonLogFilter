@@ -33,8 +33,8 @@ module Log =
 
     let rec matchTime q tLog =
       match q with
-      | Before t -> tLog < t
-      | After t -> tLog > t
+      | Before t -> tLog < TimeSpan.FromSeconds(t)
+      | After t -> tLog > TimeSpan.FromSeconds(t)
       | Between (t1, t2) -> (matchTime (After t1) tLog) && (matchTime (Before t2) tLog)
 
     let matchWhere q (dLog:JToken) =
@@ -60,6 +60,12 @@ module Log =
             |> iterb (fun file -> not file.Lines.IsEmpty)
       }
 
+    let mergeFile (lf1:LogFile) (lf2:LogFile) : LogFile =
+      {
+        lf1 with
+          Lines = (List.append lf1.Lines lf2.Lines)
+            |> List.sortBy (fun ln -> ln.Time)
+      }
 
   let fromSources s (l:Log) : Log =
     {
@@ -89,12 +95,37 @@ module Log =
 
   let fromDirectory (path:string) =
     Parse.fromDirectory path
-  //let combine (l1:Log) (l2:Log) : Log =
-  //  if l1.Time <> l2.Time then
-  //    raise "Logs with different start times cannot be combined"
-  //  else
-  //  {
-  //    l1 with
-  //      Files =
 
+  let combine (l1:Log) (l2:Log) : Log =
+    if l1.Time <> l2.Time then
+      raise (new Exception("Logs with different start times cannot be combined"))
+    else
+      let empty = Map.empty<string, LogFile>
+      {
+        l1 with
+          Files =
+            List.fold (fun map (lf:LogFile) ->
+              if Map.containsKey lf.Filename map then
+                Map.add lf.Filename (Internal.mergeFile lf (Map.find lf.Filename map)) map
+              else
+                Map.add lf.Filename lf map
+            ) empty (List.append l1.Files l2.Files)
+            |> Map.toList
+            |> List.map snd
+      }
+
+  let mergeSingleton singleLog fullLog =
+    let singleFile = List.head singleLog.Files
+    let singleInFull = {
+      fullLog with
+        Files =
+          fullLog.Files
+          |> List.map (fun file ->
+            {
+              Filename = file.Filename
+              Lines = singleFile.Lines
+            }
+          )
+    }
+    combine fullLog singleInFull
 
