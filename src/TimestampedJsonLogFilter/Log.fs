@@ -1,6 +1,7 @@
 namespace TimestampedJsonLogFilter
 
 open TimestampedJsonLogFilter.Types
+open TimestampedJsonLogFilter.QueryConditions
 open System.IO
 open System
 open System.Text.RegularExpressions
@@ -9,40 +10,15 @@ open Newtonsoft.Json.Linq
 module Log =
 
   module Internal =
-    let iter (f:'a -> 'a option) (aList:'a list) : 'a list =
-      let rec itera f al =
-        match al with
-        | a :: l ->
-          match (f a) with
-          | Some b -> b :: itera f l
-          | None -> itera f l
-        | [] -> []
-      itera f aList
 
     let boolToOption f v =
       if (f v) then Some v else None
-
-    let objectToOption<'o when 'o : null and 'o : equality>(o:'o) =
-      if o <> null then Some o else None
-
-    let iterb (f:'a -> bool) (aList:'a list) : 'a list =
-      iter (fun a -> boolToOption f a) aList
-
-    let itero<'a when 'a : null and 'a : equality> (f:'a -> 'a) (aList:'a list) : 'a list =
-      iter (fun a -> objectToOption (f a)) aList
 
     let rec matchTime q tLog =
       match q with
       | Before t -> tLog < TimeSpan.FromSeconds(t)
       | After t -> tLog > TimeSpan.FromSeconds(t)
       | Between (t1, t2) -> (matchTime (After t1) tLog) && (matchTime (Before t2) tLog)
-
-    let matchWhere q (dLog:JToken) =
-      let tok = dLog.SelectToken(q.Path)
-      if tok <> null then
-        q.Condition tok
-      else
-        false
 
     let fileFilter (f:LogLine -> LogLine option) (l:Log) : Log =
       {
@@ -54,10 +30,10 @@ module Log =
                 Filename = file.Filename
                 Lines =
                   file.Lines
-                  |> iter f
+                  |> List.choose f
               }
             )
-            |> iterb (fun file -> not file.Lines.IsEmpty)
+            |> List.filter (fun file -> not file.Lines.IsEmpty)
       }
 
     let mergeFile (lf1:LogFile) (lf2:LogFile) : LogFile =
@@ -72,26 +48,35 @@ module Log =
       l with
         Files =
           l.Files
-          |> Internal.iterb (fun file -> Regex.Match(file.Filename, s).Success)
+          |> List.filter (fun file -> Regex.Match(file.Filename, s).Success)
     }
 
   let fromTime (q:QueryTime)  =
     Internal.fileFilter (Internal.boolToOption (fun ln -> Internal.matchTime q ln.Time))
 
   let where (q:QueryWhere) =
-    Internal.fileFilter (Internal.boolToOption (fun ln -> Internal.matchWhere q ln.Data))
+    Internal.fileFilter (Internal.boolToOption (fun ln -> matchWhere q ln.Data))
 
-  let select (f:LogMap) =
+  let whereNot (q:QueryWhere) =
+    Internal.fileFilter (Internal.boolToOption (fun ln -> not (matchWhere q ln.Data)))
+
+  let select (fs:LogMap list) =
     Internal.fileFilter (fun ln ->
-      let token = f ln.Data
-      if token <> null then
-        Some { ln with Data = token }
-      else
-        None
+      fs
+      |> List.tryPick (fun f ->
+        let token = f ln.Data
+        if token <> null then
+          Some { ln with Data = token }
+        else
+          None
+      )
     )
 
+  let selectPaths (paths:string list) =
+    select (List.map (fun path -> (fun t -> t.SelectToken(path))) paths)
+
   let selectPath (path:string) =
-    select (fun t -> t.SelectToken(path))
+    selectPaths [path]
 
   let fromDirectory (path:string) =
     Parse.fromDirectory path

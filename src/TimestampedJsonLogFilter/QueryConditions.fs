@@ -3,6 +3,7 @@ namespace TimestampedJsonLogFilter
 open System
 open System.Diagnostics
 open Newtonsoft.Json.Linq
+open TimestampedJsonLogFilter.Types
 
 module QueryConditions =
 
@@ -50,3 +51,11 @@ module QueryConditions =
 
   let qOr c1 c2 o =
     (c1 o) || (c2 o)
+
+  let matchWhere q (dLog:JToken) =
+    let tok = dLog.SelectToken(q.Path)
+    if tok <> null then
+      q.Condition tok
+    else
+      false
+
