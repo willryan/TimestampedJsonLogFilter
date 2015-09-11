@@ -1,7 +1,7 @@
 type project
 owners
     Will Ryan
-authors 
+authors
     Will Ryan
 projectUrl
     http://github.com/willryan/TimestampedJsonLogFilter
@@ -19,5 +19,5 @@ summary
     filters timestamped json logs
 description
     filters timestamped json logs
-
+version 0.1
 
