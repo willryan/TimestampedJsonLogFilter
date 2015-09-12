@@ -19,5 +19,6 @@ summary
     filters timestamped json logs
 description
     filters timestamped json logs
-version 0.1
+version
+    0.3
 
