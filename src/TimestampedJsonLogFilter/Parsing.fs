@@ -36,12 +36,16 @@ module Parse =
       |> List.filter (fun fn -> fn.EndsWith(".log"))
 
     let lineToTimeData (line:string) =
-      match line.Split('\t') with
-        | [| time ; payload |] ->
-          externals.DateTimeParser(time) , externals.JObjectParser(payload)
+      try
+        match line.Split('\t') with
+          | [| time ; payload |] ->
+            externals.DateTimeParser(time) , externals.JObjectParser(payload)
+          | _ -> raise (new Exception(sprintf "Invalid line %s" line))
+      with
         | _ -> raise (new Exception(sprintf "Invalid line %s" line))
 
     let fileToLines filename =
+      printfn "parse %s" filename
       let lines =
         filename
         |> externals.LineReader
