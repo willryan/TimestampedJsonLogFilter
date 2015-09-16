@@ -84,8 +84,9 @@ module Log =
   let selectPath (path:string) =
     selectPaths [path]
 
-  let fromDirectory (path:string) =
-    Parse.fromDirectory path
+  let fromDirectory = Parse.fromDirectory
+
+  let toDirectory = Parse.toDirectory
 
   let combine (l1:Log) (l2:Log) : Log =
     if l1.Time <> l2.Time then

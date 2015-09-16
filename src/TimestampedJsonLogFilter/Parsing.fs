@@ -3,6 +3,7 @@ namespace TimestampedJsonLogFilter
 open TimestampedJsonLogFilter.Types
 open System.IO
 open System
+open Newtonsoft.Json
 open Newtonsoft.Json.Linq
 
 module Parse =
@@ -11,6 +12,7 @@ module Parse =
     type Externals = {
       DirFileFinder : string -> string list
       LineReader : string -> string list
+      FileWriter : string -> string list -> bool
       DateTimeParser : string -> DateTime
       JObjectParser : string -> JObject
     }
@@ -19,13 +21,18 @@ module Parse =
       DirFileFinder =
         (fun (dir:string) ->
           (new DirectoryInfo(dir)).GetFiles()
-          |> Array.map (fun fi -> fi.FullName)
+          |> Array.map (fun fi -> fi.Name)
           |> Array.toList
         )
       LineReader =
         (fun fn ->
           File.ReadAllLines fn
           |> Array.toList
+        )
+      FileWriter =
+        (fun fn lines ->
+          File.WriteAllLines(fn,(List.toArray lines))
+          true
         )
       DateTimeParser = DateTime.Parse
       JObjectParser = JObject.Parse
@@ -44,16 +51,17 @@ module Parse =
       with
         | _ -> raise (new Exception(sprintf "Invalid line %s" line))
 
-    let fileToLines filename =
-      printfn "parse %s" filename
+    let fileToLines root filename =
+      let fullname = sprintf "%s/%s" root filename
+      printfn "parse %s" fullname
       let lines =
-        filename
+        fullname
         |> externals.LineReader
         |> List.map lineToTimeData
       lines, filename
 
-    let filesToLines files =
-      List.map fileToLines files
+    let filesToLines root files =
+      List.map (fileToLines root) files
 
     let linesToFileObject earliest (lines, filename) =
        {
@@ -78,15 +86,28 @@ module Parse =
       let files =List.map (linesToFileObject earliest) filesLines
       earliest, files
 
+    let transformLine (time:DateTime) (line:LogLine) =
+      sprintf "%A\t%s" (time + line.Time) (line.Data.ToString(Formatting.None))
+
+    let writeFile directory time (logFile:LogFile) =
+      let fn = sprintf "%s/%s" directory logFile.Filename
+      let lines =
+        logFile.Lines
+        |> List.map (transformLine time)
+      externals.FileWriter fn lines
+
   let fromDirectory (directory:string) : Log =
     let (earliest, files) =
       directory
       |> Internal.filesInDir
-      |> Internal.filesToLines
+      |> Internal.filesToLines directory
       |> Internal.linesToFileObjects
     {
       Files = files
       Time = earliest
     }
 
-  //let ToDirectory (log:Log) (directoryPath:string) =
+  let toDirectory (directory:string) (log:Log) =
+    log.Files
+    |> List.map (Internal.writeFile directory log.Time)
+    |> ignore
