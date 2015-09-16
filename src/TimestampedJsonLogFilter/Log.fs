@@ -1,5 +1,6 @@
 namespace TimestampedJsonLogFilter
 
+open TimestampedJsonLogFilter.Util
 open TimestampedJsonLogFilter.Types
 open TimestampedJsonLogFilter.QueryConditions
 open System.IO
@@ -53,6 +54,15 @@ module Log =
 
   let fromTime (q:QueryTime)  =
     Internal.fileFilter (Internal.boolToOption (fun ln -> Internal.matchTime q ln.Time))
+
+  let after v =
+    fromTime <| After (toDbl v)
+
+  let before v =
+    fromTime <| Before (toDbl v)
+
+  let between v1 v2 =
+    fromTime <| Between ((toDbl v1), (toDbl v2))
 
   let whereQ (q:QueryWhere) =
     Internal.fileFilter (Internal.boolToOption (fun ln -> qWhere q ln.Data))

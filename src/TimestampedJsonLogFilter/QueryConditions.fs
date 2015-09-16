@@ -3,7 +3,9 @@ namespace TimestampedJsonLogFilter
 open System
 open System.Diagnostics
 open Newtonsoft.Json.Linq
+open TimestampedJsonLogFilter.Util
 open TimestampedJsonLogFilter.Types
+open System.Text.RegularExpressions
 
 module QueryConditions =
 
@@ -24,9 +26,6 @@ module QueryConditions =
 
   let dblCast = mathCast<double>
 
-  let toDbl v =
-      Convert.ChangeType(v, typeof<double>) :?> double
-
   let mathEquals value = dblCast (fun v -> v = toDbl value)
 
   let gt value = dblCast (fun v -> v > toDbl value)
@@ -38,6 +37,8 @@ module QueryConditions =
   let stringEquals value = stringCast (fun v -> v = value)
 
   let stringContains value = stringCast (fun v -> v.Contains(value))
+
+  let grep value = stringCast (fun v -> Regex.Match(v, value).Success)
 
   let arrayCast f (o:JToken) = f (o :?> JArray)
 

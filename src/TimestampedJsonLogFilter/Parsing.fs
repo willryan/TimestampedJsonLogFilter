@@ -87,7 +87,9 @@ module Parse =
       earliest, files
 
     let transformLine (time:DateTime) (line:LogLine) =
-      sprintf "%A\t%s" (time + line.Time) (line.Data.ToString(Formatting.None))
+      let time = (time + line.Time).ToString("yyyy-MM-ddTHH:mm:ss.ffff")
+      let data = line.Data.ToString(Formatting.None)
+      sprintf "%s\t%s" time data
 
     let writeFile directory time (logFile:LogFile) =
       let fn = sprintf "%s/%s" directory logFile.Filename

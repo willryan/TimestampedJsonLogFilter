@@ -45,6 +45,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Util.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Parsing.fs" />
     <Compile Include="QueryConditions.fs" />
