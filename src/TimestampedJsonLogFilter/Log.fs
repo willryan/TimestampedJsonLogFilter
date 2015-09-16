@@ -54,11 +54,17 @@ module Log =
   let fromTime (q:QueryTime)  =
     Internal.fileFilter (Internal.boolToOption (fun ln -> Internal.matchTime q ln.Time))
 
-  let where (q:QueryWhere) =
-    Internal.fileFilter (Internal.boolToOption (fun ln -> matchWhere q ln.Data))
+  let whereQ (q:QueryWhere) =
+    Internal.fileFilter (Internal.boolToOption (fun ln -> qWhere q ln.Data))
 
-  let whereNot (q:QueryWhere) =
-    Internal.fileFilter (Internal.boolToOption (fun ln -> not (matchWhere q ln.Data)))
+  let where path cond =
+    whereQ { Path = path ; Condition = cond }
+
+  let whereNotQ (q:QueryWhere) =
+    Internal.fileFilter (Internal.boolToOption (fun ln -> not (qWhere q ln.Data)))
+
+  let whereNot path cond =
+    whereNotQ { Path = path ; Condition = cond }
 
   let select (fs:LogMap list) =
     Internal.fileFilter (fun ln ->

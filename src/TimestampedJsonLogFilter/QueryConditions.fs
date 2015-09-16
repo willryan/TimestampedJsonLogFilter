@@ -10,38 +10,54 @@ module QueryConditions =
   module Internal =
     let JTokenToType<'T when 'T :> Object> (o:JToken) =
       let asObj = o :> Object
-      Convert.ChangeType(asObj, typeof<'T>) :?> 'T
+      try
+        asObj :?> 'T
+      with
+      _ ->
+        Convert.ChangeType(asObj, typeof<'T>) :?> 'T
 
   let exists (o:JToken) =
     o <> null
 
-  let cast<'T when 'T :> Object> (f:'T -> bool) (o:JToken) =
+  let mathCast<'T when 'T :> Object> (f:'T -> bool) (o:JToken) =
     f (Internal.JTokenToType<'T> o)
 
-  let mathCast = cast<decimal>
+  let dblCast = mathCast<double>
 
-  let mathEquals value = mathCast (fun v -> v = value)
+  let toDbl v =
+      Convert.ChangeType(v, typeof<double>) :?> double
 
-  let gt value = mathCast (fun v -> v > value)
+  let mathEquals value = dblCast (fun v -> v = toDbl value)
 
-  let lt value = mathCast (fun v -> v < value)
+  let gt value = dblCast (fun v -> v > toDbl value)
 
-  let stringCast = cast<string>
+  let lt value = dblCast (fun v -> v < toDbl value)
+
+  let stringCast f (o:JToken) = f (string o)
 
   let stringEquals value = stringCast (fun v -> v = value)
 
-  let containsString value = stringCast (fun v -> v.Contains(value))
+  let stringContains value = stringCast (fun v -> v.Contains(value))
 
-  let arrayCast = cast<JArray>
+  let arrayCast f (o:JToken) = f (o :?> JArray)
 
-  let arrayContains<'T when 'T : equality> (value:'T) = arrayCast (fun v ->
+  let stringArrayContains (value:string) = arrayCast (fun v ->
     v.Children()
-    |> Seq.tryFind (fun o ->
-      let converted = Internal.JTokenToType o
-      converted = value
-      )
-    |> Option.isSome
+    |> Seq.tryFind (fun av ->
+      (string)av = value
     )
+    |> Option.isSome
+  )
+
+  let mathArrayContains value = arrayCast (fun v ->
+    let valueD = toDbl value
+
+    v.Children()
+    |> Seq.tryFind (fun av ->
+      (double)av = valueD
+    )
+    |> Option.isSome
+  )
 
   let qNot f o =
     not <| f o
@@ -52,7 +68,7 @@ module QueryConditions =
   let qOr c1 c2 o =
     (c1 o) || (c2 o)
 
-  let matchWhere q (dLog:JToken) =
+  let qWhere q (dLog:JToken) =
     let tok = dLog.SelectToken(q.Path)
     if tok <> null then
       q.Condition tok

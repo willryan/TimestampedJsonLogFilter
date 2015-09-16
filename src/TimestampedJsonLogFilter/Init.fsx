@@ -1,5 +1,6 @@
 #I "bin/Release"
 #r "TimestampedJsonLogFilter.dll"
+#r "Newtonsoft.Json.dll"
 
 open TimestampedJsonLogFilter
 open TimestampedJsonLogFilter.Types

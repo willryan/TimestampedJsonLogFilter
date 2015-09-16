@@ -1,10 +1,11 @@
 namespace TimestampedJsonLogFilter.Tests
 
-open TimestampedJsonLogFilter.QueryConditions
 open NUnit.Framework
 open FsUnit
 open System
 open Newtonsoft.Json.Linq
+open TimestampedJsonLogFilter.Types
+open TimestampedJsonLogFilter.QueryConditions
 
 module QueryConditionsTests =
 
@@ -13,7 +14,8 @@ module QueryConditionsTests =
     'a': 1,
     'b': 'bar',
     'd': 10,
-    'e': [2, 4, 8]
+    'e': [2, 4, 8],
+    'f': ['two', 'four', 'eight']
   }
   ")
 
@@ -27,7 +29,7 @@ module QueryConditionsTests =
   [<Test>]
   let ``MathEquals filters properly`` () =
     let tok = jObj.SelectToken("d")
-    mathEquals 10m tok |> should equal true
+    mathEquals 10 tok |> should equal true
     mathEquals 10.1m tok |> should equal false
 
   [<Test>]
@@ -56,26 +58,30 @@ module QueryConditionsTests =
   [<Test>]
   let ``ContainsString filters properly`` () =
     let tok = jObj.SelectToken("b")
-    containsString "bar" tok |> should equal true
-    containsString "ba" tok |> should equal true
-    containsString "ar" tok |> should equal true
-    containsString "barf" tok |> should equal false
+    stringContains "bar" tok |> should equal true
+    stringContains "ba" tok |> should equal true
+    stringContains "ar" tok |> should equal true
+    stringContains "barf" tok |> should equal false
 
   [<Test>]
-  let ``Contains filters properly`` () =
+  let ``arrayContains filters properly`` () =
     let tok = jObj.SelectToken("e")
-    arrayContains 2 tok |> should equal true
-    arrayContains 3 tok |> should equal false
-    arrayContains 8 tok |> should equal true
+    mathArrayContains 2 tok |> should equal true
+    mathArrayContains 3 tok |> should equal false
+    mathArrayContains 8 tok |> should equal true
+    let tok2 = jObj.SelectToken("f")
+    stringArrayContains "two" tok2 |> should equal true
+    stringArrayContains "three" tok2 |> should equal false
+    stringArrayContains "eight" tok2 |> should equal true
 
   [<Test>]
   let ``boolean algebra`` () =
     let tok = jObj.SelectToken("e")
-    (qAnd (arrayContains 4) (arrayContains 8)) tok |> should equal true
-    (qAnd (arrayContains 5) (arrayContains 8)) tok |> should equal false
-    (qOr (arrayContains 5) (arrayContains 8)) tok |> should equal true
-    (qNot (qOr (arrayContains 5) (arrayContains 8))) tok |> should equal false
-    (qNot (qAnd (arrayContains 5) (arrayContains 8))) tok |> should equal true
-    (qAnd (arrayContains 4) (qNot (arrayContains 5))) tok |> should equal true
+    (qAnd (mathArrayContains 4) (mathArrayContains 8)) tok |> should equal true
+    (qAnd (mathArrayContains 5) (mathArrayContains 8)) tok |> should equal false
+    (qOr (mathArrayContains 5) (mathArrayContains 8)) tok |> should equal true
+    (qNot (qOr (mathArrayContains 5) (mathArrayContains 8))) tok |> should equal false
+    (qNot (qAnd (mathArrayContains 5) (mathArrayContains 8))) tok |> should equal true
+    (qAnd (mathArrayContains 4) (qNot (mathArrayContains 5))) tok |> should equal true
 
 

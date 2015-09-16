@@ -132,6 +132,12 @@ Target "Build" (fun _ ->
     |> ignore
 )
 
+Target "BuildDebug" (fun _ ->
+    !! solutionFile
+    |> MSBuildDebug "" "Rebuild"
+    |> ignore
+)
+
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
 
