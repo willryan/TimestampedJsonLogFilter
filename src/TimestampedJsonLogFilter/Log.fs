@@ -76,6 +76,9 @@ module Log =
   let whereNot path cond =
     whereNotQ { Path = path ; Condition = cond }
 
+  let grep str =
+    where "$" <| QueryConditions.grep str
+
   let select (fs:LogMap list) =
     Internal.fileFilter (fun ln ->
       fs
