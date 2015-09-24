@@ -75,4 +75,3 @@ module QueryConditions =
       q.Condition tok
     else
       false
-

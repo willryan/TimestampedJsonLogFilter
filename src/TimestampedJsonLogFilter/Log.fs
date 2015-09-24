@@ -133,4 +133,3 @@ module Log =
           )
     }
     combine fullLog singleInFull
-

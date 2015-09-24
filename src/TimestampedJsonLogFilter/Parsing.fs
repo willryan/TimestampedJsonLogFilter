@@ -83,7 +83,7 @@ module Parse =
           fst (List.minBy fst lines)
         )
       let earliest = fst (List.head earliestLines)
-      let files =List.map (linesToFileObject earliest) filesLines
+      let files = List.map (linesToFileObject earliest) filesLines
       earliest, files
 
     let transformLine (time:DateTime) (line:LogLine) =

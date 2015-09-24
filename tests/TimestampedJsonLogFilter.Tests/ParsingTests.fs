@@ -34,9 +34,9 @@ module ParsingTests =
           ]
         | _ -> []
       )
-      FileWriter = (fun fn ln -> true)
       DateTimeParser = (fun dts -> retDate)
       JObjectParser = (fun s -> parsedObject)
+      FileWriter = (fun s l -> true)
     }
 
   [<Test>]
