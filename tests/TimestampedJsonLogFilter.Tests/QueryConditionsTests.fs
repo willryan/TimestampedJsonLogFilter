@@ -15,7 +15,12 @@ module QueryConditionsTests =
     'b': 'bar',
     'd': 10,
     'e': [2, 4, 8],
-    'f': ['two', 'four', 'eight']
+    'f': ['two', 'four', 'eight'],
+    'g': {
+      'subA' : { 'sub1' : 1, 'sub2' : 2},
+      'subB' : { 'sub3' : 3, 'sub4' : 4},
+      'subC' : { 'sub2' : 5 }
+    }
   }
   ")
 
@@ -84,4 +89,15 @@ module QueryConditionsTests =
     (qNot (qAnd (mathArrayContains 5) (mathArrayContains 8))) tok |> should equal true
     (qAnd (mathArrayContains 4) (qNot (mathArrayContains 5))) tok |> should equal true
 
+  [<Test>]
+  let ``qWhere lets you nest querys`` ()=
+    let tok = jObj.SelectToken("g")
+    tok
+    |> qAnd (qWhere { Path = "subA.sub2" ; Condition = exists })
+           (qWhere { Path = "subC.sub2" ; Condition = exists })
+    |> should equal true
 
+    tok
+    |> qAnd (qWhere { Path = "subB.sub2" ; Condition = exists })
+           (qWhere { Path = "subC.sub2" ; Condition = exists })
+    |> should equal false

@@ -60,6 +60,7 @@
     <Compile Include="ParsingTests.fs" />
     <Compile Include="QueryConditionsTests.fs" />
     <None Include="paket.references" />
+    <Compile Include="LogTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
