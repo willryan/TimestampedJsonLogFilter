@@ -5,6 +5,8 @@ open System.IO
 open System
 open Newtonsoft.Json
 open Newtonsoft.Json.Linq
+open ExtCore.Control
+open Util
 
 module Parse =
 
@@ -38,18 +40,30 @@ module Parse =
       JObjectParser = JObject.Parse
     }
 
+
+    let lineToTimeDataRaw (line:string) =
+      let splitLine(ln:string) = 
+        match ln.Split('\t') with
+          | [| time ; payload |] -> Choice.result (time, payload)
+          | _ -> Choice.error (new Exception("no tab"))
+
+      choice {
+        let! (timeStr, payloadStr) = splitLine line
+        let! time = tryChoose (fun _ -> externals.DateTimeParser(timeStr))
+        let! payload = tryChoose (fun _ -> externals.JObjectParser(payloadStr))
+        return (time, payload)
+      }
+
+    let lineToTimeData (line:string) =
+      match lineToTimeDataRaw line with
+        | Choice.Choice1Of2 r -> Some r
+        | Choice.Choice2Of2 e -> 
+          printfn "Invalid line %s:\n\t%s" line e.Message
+          None
+
     let filesInDir dir =
       externals.DirFileFinder dir
       |> List.filter (fun fn -> fn.EndsWith(".log"))
-
-    let lineToTimeData (line:string) =
-      try
-        match line.Split('\t') with
-          | [| time ; payload |] ->
-            externals.DateTimeParser(time) , externals.JObjectParser(payload)
-          | _ -> raise (new Exception(sprintf "Invalid line %s" line))
-      with
-        | _ -> raise (new Exception(sprintf "Invalid line %s" line))
 
     let fileToLines root filename =
       let fullname = sprintf "%s/%s" root filename
@@ -57,7 +71,7 @@ module Parse =
       let lines =
         fullname
         |> externals.LineReader
-        |> List.map lineToTimeData
+        |> List.choose lineToTimeData
       lines, filename
 
     let filesToLines root files =

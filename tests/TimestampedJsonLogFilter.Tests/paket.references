@@ -1,4 +1,6 @@
-NUnit
-NUnit.Runners
-FsUnit
+xunit.core
+xunit.runner.visualstudio
+FsUnit.xUnit
 Newtonsoft.Json
+ExtCore
+FSharp.Core
