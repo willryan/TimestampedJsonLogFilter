@@ -147,6 +147,7 @@ Target "RunTests" (fun _ ->
     |> xUnit (fun p ->
         { p with
             TimeOut = TimeSpan.FromMinutes 20.
+            ToolPath = "./packages/xunit.runner.console/tools/xunit.console.exe"
         })
 )
 
