@@ -50,24 +50,24 @@ module ParsingTests =
   let ``lineToTimeData splits and parses`` () =
     setExternals()
     Internal.lineToTimeData "date\tdata"
-    |> should equal (retDate, parsedObject)
+    |> should equal (Some (retDate, parsedObject))
 
   [<Fact>]
   let ``lineToTimeDataRaw split error`` () =
     setExternals()
-    Internal.lineToTimeDataRaw "date,data"
-    |> should equal (Choice.error "Invalid line date,data\n\tno tab")
+    let err = Internal.lineToTimeDataRaw "date,data" |> Choice.getError
+    err.Message |> should equal "no tab"
 
   [<Fact>]
   let ``lineToTimeDataRaw date error`` () =
     setExternals()
     Internal.externals <- { Internal.externals with DateTimeParser = DateTime.Parse }
-    Internal.lineToTimeDataRaw "date\tdata"
-    |> should equal (Choice.error "Invalid line date\tdata\n\tno tab")
+    let err = Internal.lineToTimeDataRaw "date\tdata" |> Choice.getError
+    err.Message |> should haveSubstring "string was not recognized as a valid DateTime."
 
   [<Fact>]
   let ``lineToTimeDataRaw payload error`` () =
     setExternals()
     Internal.externals <- { Internal.externals with JObjectParser = JObject.Parse }
-    Internal.lineToTimeDataRaw "date\t{'unended'"
-    |> should equal (Choice.error "Invalid line date\tdata\n\tno tab")
+    let err = Internal.lineToTimeDataRaw "date\t{'unended'" |> Choice.getError
+    err.Message |> should startWith "Invalid character"

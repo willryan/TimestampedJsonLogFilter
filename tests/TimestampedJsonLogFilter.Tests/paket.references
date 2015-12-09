@@ -3,4 +3,3 @@ xunit.runner.visualstudio
 FsUnit.xUnit
 Newtonsoft.Json
 ExtCore
-FSharp.Core
