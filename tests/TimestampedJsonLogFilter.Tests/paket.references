@@ -1,5 +1,6 @@
 xunit.core
 xunit.runner.visualstudio
+xunit.assert
 FsUnit.xUnit
 Newtonsoft.Json
 ExtCore

@@ -1,8 +1,8 @@
 namespace TimestampedJsonLogFilter.Tests
 
 open TimestampedJsonLogFilter.Parse
-open FsUnit.Xunit
 open Xunit
+open FsUnit.Xunit
 open System
 open Newtonsoft.Json.Linq
 open ExtCore.Control

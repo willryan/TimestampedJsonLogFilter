@@ -4,9 +4,9 @@ open System.Reflection
 [<assembly: AssemblyTitleAttribute("TimestampedJsonLogFilter")>]
 [<assembly: AssemblyProductAttribute("TimestampedJsonLogFilter")>]
 [<assembly: AssemblyDescriptionAttribute("filters timestamped json logs")>]
-[<assembly: AssemblyVersionAttribute("0.6")>]
-[<assembly: AssemblyFileVersionAttribute("0.6")>]
+[<assembly: AssemblyVersionAttribute("0.7")>]
+[<assembly: AssemblyFileVersionAttribute("0.7")>]
 do ()
 
 module internal AssemblyVersionInformation =
-    let [<Literal>] Version = "0.6"
+    let [<Literal>] Version = "0.7"
