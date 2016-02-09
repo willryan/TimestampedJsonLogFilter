@@ -75,7 +75,9 @@ module Parse =
       lines, filename
 
     let filesToLines root files =
-      List.map (fileToLines root) files
+      files
+      |> List.map (fileToLines root)
+      |> List.filter (fun (lines, _) -> (not (List.isEmpty lines)))
 
     let linesToFileObject earliest (lines, filename) =
        {
@@ -93,9 +95,7 @@ module Parse =
     let linesToFileObjects filesLines =
       let (earliestLines, _) =
         filesLines
-        |> List.minBy (fun (lines, _) ->
-          fst (List.minBy fst lines)
-        )
+        |> List.minBy (fun (lines, _) -> fst (List.minBy fst lines))
       let earliest = fst (List.head earliestLines)
       let files = List.map (linesToFileObject earliest) filesLines
       earliest, files
