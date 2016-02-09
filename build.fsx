@@ -144,10 +144,11 @@ Target "BuildDebug" (fun _ ->
 
 Target "RunTests" (fun _ ->
     !! testAssemblies
-    |> xUnit (fun p ->
+    |> xUnit2 (fun p ->
         { p with
             TimeOut = TimeSpan.FromMinutes 20.
             ToolPath = "./packages/xunit.runner.console/tools/xunit.console.exe"
+            ShadowCopy = false
         })
 )
 
