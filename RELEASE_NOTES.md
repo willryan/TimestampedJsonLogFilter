@@ -1,3 +1,6 @@
+### 0.8 - Feb 9, 2016
+* Help documentation
+
 ### 0.7 - Feb 9, 2016
 * Handle empty files
 
